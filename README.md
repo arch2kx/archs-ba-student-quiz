@@ -26,7 +26,7 @@ Locally:
 5. View your final score and results
 
 Online:
-<website_url>
+https://arch2kx.github.io/ba-student-age-quiz/
 
 No additional dependencies or installation required. Just open the HTML file in any modern web browser.
 
