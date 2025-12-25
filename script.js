@@ -339,7 +339,7 @@ function showResults() {
                 <span>Your answer: ${answer.userAnswer} | Correct answer: ${answer.correctAnswer}</span>
             </div>
             <div class="result-status ${answer.isCorrect ? 'correct' : 'incorrect'}">
-                ${answer.isCorrect ? '✓' : '✗'}
+                ${answer.isCorrect ? '✅' : '❌'}
             </div>
         `;
 
