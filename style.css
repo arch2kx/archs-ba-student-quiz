@@ -38,6 +38,19 @@ body.dark-mode {
     --button-hover: #404040;
 }
 
+.logo {
+    width: 90%;  /* 20% smaller = 80% of original */
+    max-width: 400px;  /* Optional: set a max size */
+    height: auto;  /* Maintains aspect ratio */
+    display: block;
+    margin: 10px auto;  /* Top margin + centered */
+}
+
+/* Dark mode logo swap */
+body.dark-mode .logo {
+    content: url('images/ba_student_quiz_logo_dark.png');
+}
+
 body {
     font-family: Noto Sans, sans-serif;
     background-color: var(--bg-primary);

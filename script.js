@@ -21,6 +21,16 @@ startBtn.addEventListener('click', startQuiz);
 restartBtn.addEventListener('click', resetQuiz);
 themeToggle.addEventListener('click', toggleTheme);
 
+// Update the logo on screen
+function updateLogo() {
+    const logo = document.getElementById('logo');
+    if (document.body.classList.contains('dark-mode')) {
+        logo.src = 'images/ba_student_quiz_logo_dark.png';
+    } else {
+        logo.src = 'images/ba_student_quiz_logo.png';
+    }
+}
+
 // Theme toggle functionality
 function toggleTheme() {
     const body = document.body;
@@ -36,6 +46,7 @@ function toggleTheme() {
         themeIcon.textContent = '🌙';
         localStorage.setItem('theme', 'light');
     }
+    updateLogo();
 }
 
 // Load saved theme on page load
@@ -99,6 +110,7 @@ async function fetchStudentData() {
 async function startQuiz() {
     // Get settings
     quizSettings = {
+        quizType: document.getElementById('quiz-type').value,
         numQuestions: parseInt(document.getElementById('num-questions').value),
         answerType: document.getElementById('answer-type').value,
         studentOrder: document.getElementById('student-order').value
@@ -142,7 +154,19 @@ function prepareQuizQuestions() {
     }
 
     // Select the number of questions requested
-    quizQuestions = selectedStudents.slice(0, Math.min(quizSettings.numQuestions, selectedStudents.length));
+    let selected = selectedStudents.slice(0, Math.min(quizSettings.numQuestions, selectedStudents.length));
+    
+    // Assign question types based on quiz settings
+    quizQuestions = selected.map(student => {
+        let questionType;
+        if (quizSettings.quizType === 'both') {
+            // Randomly assign age or name
+            questionType = Math.random() < 0.5 ? 'age' : 'name';
+        } else {
+            questionType = quizSettings.quizType;
+        }
+        return { ...student, questionType };
+    });
 }
 
 // Display current question
@@ -157,11 +181,21 @@ function displayQuestion() {
     // Display student info
     const studentImage = document.getElementById('student-image');
     const studentName = document.getElementById('student-name');
+    const questionText = document.querySelector('.question h3');
 
     // Set student image (using SchaleDB image path)
     studentImage.src = `https://schaledb.com/images/student/collection/${question.Id}.webp`;
     studentImage.alt = question.Name;
-    studentName.textContent = question.Name;
+    
+    // Show name or hide it based on question type
+    if (question.questionType === 'name') {
+        studentName.style.display = 'none'; // Hide the name display completely
+        questionText.textContent = 'What is this student\'s name?';
+    } else {
+        studentName.style.display = 'block'; // Show the name display
+        studentName.textContent = question.Name;
+        questionText.textContent = 'How old is this student?';
+    }
 
     // Hide feedback
     document.getElementById('feedback').classList.add('hidden');
@@ -170,17 +204,27 @@ function displayQuestion() {
     const answerContainer = document.getElementById('answer-container');
     answerContainer.innerHTML = '';
 
-    if (quizSettings.answerType === 'multiple-choice') {
-        answerContainer.className = 'answer-container multiple-choice';
-        displayMultipleChoice(question);
+    if (question.questionType === 'age') {
+        if (quizSettings.answerType === 'multiple-choice') {
+            answerContainer.className = 'answer-container multiple-choice';
+            displayMultipleChoiceAge(question);
+        } else {
+            answerContainer.className = 'answer-container type-in';
+            displayTypeInAge(question);
+        }
     } else {
-        answerContainer.className = 'answer-container type-in';
-        displayTypeIn(question);
+        if (quizSettings.answerType === 'multiple-choice') {
+            answerContainer.className = 'answer-container multiple-choice';
+            displayMultipleChoiceName(question);
+        } else {
+            answerContainer.className = 'answer-container type-in';
+            displayTypeInName(question);
+        }
     }
 }
 
-// Display multiple choice options
-function displayMultipleChoice(question) {
+// Display multiple choice options for AGE
+function displayMultipleChoiceAge(question) {
     const correctAge = getStudentAge(question);
     const answerContainer = document.getElementById('answer-container');
 
@@ -200,14 +244,39 @@ function displayMultipleChoice(question) {
         const button = document.createElement('button');
         button.className = 'answer-btn';
         button.textContent = `${age} years old`;
-        button.dataset.age = age;
-        button.addEventListener('click', () => checkAnswer(age, correctAge, button));
+        button.dataset.answer = age;
+        button.addEventListener('click', () => checkAnswer(age, correctAge, button, 'age'));
         answerContainer.appendChild(button);
     });
 }
 
-// Display type-in input
-function displayTypeIn(question) {
+// Display multiple choice options for NAME
+function displayMultipleChoiceName(question) {
+    const correctName = question.Name;
+    const answerContainer = document.getElementById('answer-container');
+    
+    // Generate options (correct name + 3 random names)
+    const options = new Set([correctName]);
+    const shuffledStudents = shuffleArray(students.filter(s => s.Name !== correctName));
+    
+    for (let i = 0; i < 3 && i < shuffledStudents.length; i++) {
+        options.add(shuffledStudents[i].Name);
+    }
+    
+    const optionsArray = shuffleArray([...options]);
+    
+    optionsArray.forEach(name => {
+        const button = document.createElement('button');
+        button.className = 'answer-btn';
+        button.textContent = name;
+        button.dataset.answer = name;
+        button.addEventListener('click', () => checkAnswer(name, correctName, button, 'name'));
+        answerContainer.appendChild(button);
+    });
+}
+
+// Display type-in input for AGE
+function displayTypeInAge(question) {
     const answerContainer = document.getElementById('answer-container');
 
     const group = document.createElement('div');
@@ -228,7 +297,7 @@ function displayTypeIn(question) {
         const userAge = parseInt(input.value);
         if (!isNaN(userAge)) {
             const correctAge = getStudentAge(question);
-            checkAnswer(userAge, correctAge, submitBtn);
+            checkAnswer(userAge, correctAge, submitBtn, 'age');
         }
     });
 
@@ -246,16 +315,61 @@ function displayTypeIn(question) {
     input.focus();
 }
 
+// Display type-in input for NAME
+function displayTypeInName(question) {
+    const answerContainer = document.getElementById('answer-container');
+    
+    const group = document.createElement('div');
+    group.className = 'type-in-group';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'type-in-input';
+    input.placeholder = 'Enter student name';
+    input.id = 'name-input';
+    
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'submit-answer-btn';
+    submitBtn.textContent = 'Submit';
+    submitBtn.addEventListener('click', () => {
+        const userName = input.value.trim();
+        if (userName) {
+            const correctName = question.Name;
+            checkAnswer(userName, correctName, submitBtn, 'name');
+        }
+    });
+    
+    // Allow Enter key to submit
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitBtn.click();
+        }
+    });
+    
+    group.appendChild(input);
+    group.appendChild(submitBtn);
+    answerContainer.appendChild(group);
+    
+    input.focus();
+}
+
 // Check answer
-function checkAnswer(userAge, correctAge, buttonElement) {
-    const isCorrect = userAge === correctAge;
+function checkAnswer(userAnswer, correctAnswer, buttonElement, questionType) {
+    let isCorrect;
+    if (questionType === 'age') {
+        isCorrect = userAnswer === correctAnswer;
+    } else {
+        // Case-insensitive comparison for names
+        isCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+    }
 
     // Record answer
     userAnswers.push({
         student: quizQuestions[currentQuestionIndex],
-        userAnswer: userAge,
-        correctAnswer: correctAge,
-        isCorrect: isCorrect
+        userAnswer: userAnswer,
+        correctAnswer: correctAnswer,
+        isCorrect: isCorrect,
+        questionType: questionType
     });
 
     if (isCorrect) {
@@ -269,12 +383,22 @@ function checkAnswer(userAge, correctAge, buttonElement) {
     const feedback = document.getElementById('feedback');
     const feedbackText = document.getElementById('feedback-text');
 
+    const studentName = quizQuestions[currentQuestionIndex].Name;
+    
     if (isCorrect) {
         feedback.className = 'feedback correct';
-        feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${quizQuestions[currentQuestionIndex].Name} is ${correctAge} years old.`;
+        if (questionType === 'age') {
+            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${studentName} is ${correctAnswer} years old.`;
+        } else {
+            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>This student is ${correctAnswer}.`;
+        }
     } else {
         feedback.className = 'feedback incorrect';
-        feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAge}, but ${quizQuestions[currentQuestionIndex].Name} is ${correctAge} years old.`;
+        if (questionType === 'age') {
+            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but ${studentName} is ${correctAnswer} years old.`;
+        } else {
+            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but this student is ${correctAnswer}.`;
+        }
     }
 
     feedback.classList.remove('hidden');
@@ -284,15 +408,24 @@ function checkAnswer(userAge, correctAge, buttonElement) {
         const buttons = document.querySelectorAll('.answer-btn');
         buttons.forEach(btn => {
             btn.disabled = true;
-            if (parseInt(btn.dataset.age) === correctAge) {
-                btn.classList.add('correct');
-            } else if (btn === buttonElement && !isCorrect) {
-                btn.classList.add('incorrect');
+            if (questionType === 'age') {
+                if (parseInt(btn.dataset.answer) === correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn === buttonElement && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            } else {
+                if (btn.dataset.answer === correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn === buttonElement && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
             }
         });
     } else {
         buttonElement.disabled = true;
-        document.getElementById('age-input').disabled = true;
+        const inputField = document.getElementById(questionType === 'age' ? 'age-input' : 'name-input');
+        if (inputField) inputField.disabled = true;
     }
 
     // Setup next button
@@ -332,11 +465,13 @@ function showResults() {
         const resultItem = document.createElement('div');
         resultItem.className = `result-item ${answer.isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
 
+        const questionTypeLabel = answer.questionType === 'age' ? 'Age' : 'Name';
+        
         resultItem.innerHTML = `
             <img src="https://schaledb.com/images/student/collection/${answer.student.Id}.webp" alt="${answer.student.Name}">
             <div class="result-info">
                 <strong>${answer.student.Name}</strong>
-                <span>Your answer: ${answer.userAnswer} | Correct answer: ${answer.correctAnswer}</span>
+                <span>${questionTypeLabel} - Your answer: ${answer.userAnswer} | Correct: ${answer.correctAnswer}</span>
             </div>
             <div class="result-status ${answer.isCorrect ? 'correct' : 'incorrect'}">
                 ${answer.isCorrect ? '✅' : '❌'}
@@ -376,6 +511,7 @@ function getStudentAge(student) {
 // Initialize on page load
 window.addEventListener('load', () => {
     loadTheme();
+    updateLogo();
     // Optionally preload data
     // fetchStudentData();
 });

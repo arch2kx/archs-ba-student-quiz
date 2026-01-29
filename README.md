@@ -1,6 +1,6 @@
-<img src="images/ba_student_age_quiz_logo.png" alt="Blue Archive Student Age Quiz" width="425px">
+<img src="images/ba_student_quiz_logo_dark.png" alt="Blue Archive Student Quiz" width="425px">
 
-A web-based quiz game that tests your knowledge of Blue Archive student ages using data from SchaleDB.
+A web-based quiz game that tests your knowledge of Blue Archive student names and ages using data from SchaleDB.
 
 ## Features
 
@@ -16,17 +16,17 @@ A web-based quiz game that tests your knowledge of Blue Archive student ages usi
 ## How to Use
 
 Locally:
-1. Open `blue-archive-quiz.html` in your web browser
+1. Open `index.html` in your web browser
 2. Configure your quiz settings:
    - Choose the number of questions
    - Select your preferred answer type
    - Pick student selection order
 3. Click "Start Quiz" to begin
-4. Answer each question about student ages
+4. Answer each question about student names, ages, or both
 5. View your final score and results
 
 Online:
-https://arch2kx.github.io/ba-student-age-quiz/
+https://arch2kx.github.io/archs-ba-student-quiz/
 
 No additional dependencies or installation required. Just open the HTML file in any modern web browser.
 

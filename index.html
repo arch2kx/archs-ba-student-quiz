@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue Archive Student Age Quiz</title>
+    <title>Blue Archive Student Quiz</title>
     <link rel="stylesheet" href="style.css">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -13,10 +13,20 @@
     </button>
 
     <div class="container">
-        <h1>Blue Archive Student Age Quiz</h1>
+        <!--<h1>Blue Archive Student Quiz</h1>-->
+        <img id="logo" src="images/ba_student_quiz_logo.png" alt="Blue Archive Student Quiz" class="logo">
 
         <div id="setup-screen" class="screen active">
             <h2>Quiz Settings</h2>
+
+            <div class="setting-group">
+                <label for="quiz-type">Quiz Type:</label>
+                <select id="quiz-type">
+                    <option value="age" selected>Age Quiz</option>
+                    <option value="name">Name Quiz</option>
+                    <option value="both">Both (Mixed)</option>
+                </select>
+            </div>
 
             <div class="setting-group">
                 <label for="num-questions">Number of Questions:</label>
@@ -33,7 +43,7 @@
                 <label for="answer-type">Answer Type:</label>
                 <select id="answer-type">
                     <option value="multiple-choice">Multiple Choice</option>
-                    <option value="type-in">Type In Number</option>
+                    <option value="type-in">Type In Answer</option>
                 </select>
             </div>
 
