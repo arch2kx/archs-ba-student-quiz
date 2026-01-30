@@ -527,7 +527,7 @@ h3 {
 .timer-options {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 12px;
     margin-top: 10px;
 }
 
@@ -535,7 +535,7 @@ h3 {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 8px;
+    padding: 10px;
     border-radius: 5px;
     transition: background-color 0.2s;
     min-height: 44px;
@@ -547,17 +547,6 @@ h3 {
 
 .timer-option > span:first-of-type {
     margin-right: auto;
-    padding-bottom: 2px;
-}
-
-.timer-option > span {
-    align-items: center;  /* Change this to: flex-start, flex-end, or baseline */
-    font-size: 17px;
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
-    line-height: 2;  /* Adjust this: 0.9, 1, 1.2, etc. */
-    flex: 1;
-    min-height: 24px;
 }
 
 /* Custom Radio Button */
@@ -575,7 +564,6 @@ h3 {
     margin-right: 12px;
     transition: all 0.3s ease;
     flex-shrink: 0;
-    top: 5px;
 }
 
 .timer-option input[type="radio"]:hover {
@@ -591,8 +579,8 @@ h3 {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: var(--info-color);
     transform: translate(-50%, -50%);
@@ -601,7 +589,6 @@ h3 {
 /* Custom timer input wrapper */
 .timer-option .timer-custom-wrapper {
     display: flex;
-    margin-top: 10px;
     align-items: center;
     gap: 8px;
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue Archive Student Quiz</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css" type="text/css">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -19,12 +19,14 @@
         <div id="setup-screen" class="screen active">
             <h2>Quiz Settings</h2>
 
+            <!-- TODO: Add academy option soon. -->
+
             <div class="setting-group">
                 <label for="quiz-type">Quiz Type:</label>
                 <select id="quiz-type">
                     <option value="age" selected>Age Quiz</option>
                     <option value="name">Name Quiz</option>
-                    <option value="both">Both (Mixed)</option>
+                    <option value="mixed">Mixed (All Types)</option>
                 </select>
             </div>
 
@@ -56,6 +58,39 @@
                 </select>
             </div>
 
+            <div class="setting-group">
+                <label for="timer-enabled">
+                    <input type="checkbox" id="timer-enabled"> Enable Timer
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+
+            <div class="setting-group" id="timer-settings" style="display: none;">
+                <label>Time per Question:</label>
+                <div class="timer-options">
+                    <label class="timer-option">
+                        <input type="radio" name="timer-preset" value="60" checked>
+                        <span>Easy (60s)</span>
+                    </label>
+                    <label class="timer-option">
+                        <input type="radio" name="timer-preset" value="30">
+                        <span>Medium (30s)</span>
+                    </label>
+                    <label class="timer-option">
+                        <input type="radio" name="timer-preset" value="15">
+                        <span>Hard (15s)</span>
+                    </label>
+                    <label class="timer-option">
+                        <input type="radio" name="timer-preset" value="custom">
+                        <span>Custom:</span>
+                        <div class="timer-custom-wrapper">
+                            <input type="number" id="timer-custom" min="5" max="300" value="30" disabled>
+                            <span>seconds</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <button id="start-btn" class="btn-primary">Start Quiz</button>
             <div id="loading" class="loading hidden">Loading student data...</div>
             <div id="error-message" class="error hidden"></div>
@@ -65,6 +100,9 @@
             <div class="quiz-header">
                 <div class="progress">
                     Question <span id="current-question">1</span> of <span id="total-questions">10</span>
+                </div>
+                <div id="timer-display" class="timer-display hidden">
+                    Time: <span id="timer-value">30</span>s
                 </div>
                 <div class="score">
                     Score: <span id="current-score">0</span>
