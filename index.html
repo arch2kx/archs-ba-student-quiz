@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue Archive Student Quiz</title>
-    <link rel="stylesheet" href="./style.css" type="text/css">
+    <link rel="stylesheet" href="styles.css?v=4" type="text/css">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -19,13 +19,12 @@
         <div id="setup-screen" class="screen active">
             <h2>Quiz Settings</h2>
 
-            <!-- TODO: Add academy option soon. -->
-
             <div class="setting-group">
                 <label for="quiz-type">Quiz Type:</label>
                 <select id="quiz-type">
                     <option value="age" selected>Age Quiz</option>
                     <option value="name">Name Quiz</option>
+                    <option value="academy">Academy Quiz</option>
                     <option value="mixed">Mixed (All Types)</option>
                 </select>
             </div>
@@ -138,7 +137,10 @@
             <div id="results-details" class="results-details">
                 <!-- Will be populated with question results -->
             </div>
-            <button id="restart-btn" class="btn-primary">Take Another Quiz</button>
+            
+            <div class="result-actions">
+                <button id="restart-btn" class="btn-primary">Take Another Quiz</button>
+            </div>
         </div>
     </div>
 

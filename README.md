@@ -48,6 +48,3 @@ Works on all modern browsers:
 - Firefox
 - Safari
 - Edge
-
-## Credits
-Created by arch2kx

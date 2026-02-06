@@ -527,7 +527,7 @@ h3 {
 .timer-options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 5px;
     margin-top: 10px;
 }
 
@@ -535,7 +535,7 @@ h3 {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 10px;
+    padding: 8px;
     border-radius: 5px;
     transition: background-color 0.2s;
     min-height: 44px;
@@ -547,6 +547,17 @@ h3 {
 
 .timer-option > span:first-of-type {
     margin-right: auto;
+    padding-bottom: 2px;
+}
+
+.timer-option > span {
+    align-items: center;  /* Change this to: flex-start, flex-end, or baseline */
+    font-size: 17px;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    line-height: 2;  /* Adjust this: 0.9, 1, 1.2, etc. */
+    flex: 1;
+    min-height: 24px;
 }
 
 /* Custom Radio Button */
@@ -564,6 +575,7 @@ h3 {
     margin-right: 12px;
     transition: all 0.3s ease;
     flex-shrink: 0;
+    top: 5px;
 }
 
 .timer-option input[type="radio"]:hover {
@@ -579,8 +591,8 @@ h3 {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background-color: var(--info-color);
     transform: translate(-50%, -50%);
@@ -589,28 +601,49 @@ h3 {
 /* Custom timer input wrapper */
 .timer-option .timer-custom-wrapper {
     display: flex;
+    margin-top: 10px;
     align-items: center;
     gap: 8px;
 }
 
-#timer-custom {
-    width: 80px;
-    padding: 8px 12px;
-    border: 2px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    font-size: 16px;
-    text-align: center;
+/* Timer Display */
+.timer-display {
+    font-size: 18px;
+    color: #666666;
+    font-weight: bold;
 }
 
-#timer-custom:focus {
-    outline: none;
-    border-color: var(--info-color);
+/* Dark mode - white timer */
+body.dark-mode .timer-display {
+    color: #ffffff;
 }
 
-#timer-custom:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: var(--bg-tertiary);
+/* Warning state (<=10 seconds) */
+.timer-display.warning {
+    color: #ff9800;
+    animation: pulse 1s infinite;
+}
+
+body.dark-mode .timer-display.warning {
+    color: #ffb74d;
+}
+
+/* Danger state (<=5 seconds) */
+.timer-display.danger {
+    color: #f44336;
+    animation: pulse 0.5s infinite;
+}
+
+body.dark-mode .timer-display.danger {
+    color: #ff5252;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
 }

@@ -82,15 +82,20 @@ async function fetchStudentData() {
     try {
         loadingDiv.classList.remove('hidden');
         errorMessage.classList.add('hidden');
-        const response = await fetch('https://raw.githubusercontent.com/lonqie/SchaleDB/main/data/en/students.json');
+        const response = await fetch('https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/data/en/students.json');
         if (!response.ok) throw new Error('Failed to fetch student data');
         const data = await response.json();
         let studentsArray = Array.isArray(data) ? data : Object.values(data);
+        
+        console.log('Sample student:', studentsArray[0]);
+        console.log('All keys:', Object.keys(studentsArray[0]));
 
-        // Filter students with valid age
+        // Filter students with valid age AND academy
         students = studentsArray.filter(student => {
             const age = student.Age || student.age || student.CharacterAge;
-            return age && age !== 'Unknown' && age !== '?' && !isNaN(parseInt(age));
+            const hasAge = age && age !== 'Unknown' && age !== '?' && !isNaN(parseInt(age));
+            const hasAcademy = student.School && student.School !== 'Unknown';
+            return hasAge && hasAcademy;
         });
 
         if (students.length === 0) throw new Error('No valid student data found');
@@ -129,6 +134,8 @@ async function startQuiz() {
         timerEnabled: document.getElementById('timer-enabled').checked,
         timerDuration
     };
+    
+    console.log('Quiz Settings:', quizSettings);
 
     // Fetch students if not loaded
     if (students.length === 0) {
@@ -160,10 +167,13 @@ function prepareQuizQuestions() {
     quizQuestions = selected.map(student => {
         let questionType = quizSettings.quizType;
         if (quizSettings.quizType === 'mixed') {
-            questionType = ['age', 'name'][Math.floor(Math.random() * 2)];
+            questionType = ['age', 'name', 'academy'][Math.floor(Math.random() * 3)];
         }
+        console.log(`Student: ${student.Name}, Question Type: ${questionType}`);
         return { ...student, questionType };
     });
+    
+    console.log('Quiz Questions prepared:', quizQuestions);
 }
 
 // Display current question
@@ -186,6 +196,10 @@ function displayQuestion() {
     if (question.questionType === 'name') {
         studentName.style.display = 'none';
         questionText.textContent = 'What is this student\'s name?';
+    } else if (question.questionType === 'academy') {
+        studentName.style.display = 'block';
+        studentName.textContent = question.Name;
+        questionText.textContent = 'Which academy does this student attend?';
     } else {
         studentName.style.display = 'block';
         studentName.textContent = question.Name;
@@ -197,12 +211,31 @@ function displayQuestion() {
     // Render answer options
     const answerContainer = document.getElementById('answer-container');
     answerContainer.innerHTML = '';
+    
     if (question.questionType === 'age') {
-        if (quizSettings.answerType === 'multiple-choice') displayMultipleChoiceAge(question);
-        else displayTypeInAge(question);
-    } else {
-        if (quizSettings.answerType === 'multiple-choice') displayMultipleChoiceName(question);
-        else displayTypeInName(question);
+        if (quizSettings.answerType === 'multiple-choice') {
+            answerContainer.className = 'answer-container multiple-choice';
+            displayMultipleChoiceAge(question);
+        } else {
+            answerContainer.className = 'answer-container type-in';
+            displayTypeInAge(question);
+        }
+    } else if (question.questionType === 'name') {
+        if (quizSettings.answerType === 'multiple-choice') {
+            answerContainer.className = 'answer-container multiple-choice';
+            displayMultipleChoiceName(question);
+        } else {
+            answerContainer.className = 'answer-container type-in';
+            displayTypeInName(question);
+        }
+    } else if (question.questionType === 'academy') {
+        if (quizSettings.answerType === 'multiple-choice') {
+            answerContainer.className = 'answer-container multiple-choice';
+            displayMultipleChoiceAcademy(question);
+        } else {
+            answerContainer.className = 'answer-container type-in';
+            displayTypeInAcademy(question);
+        }
     }
 
     if (quizSettings.timerEnabled) startTimer();
@@ -246,6 +279,40 @@ function displayMultipleChoiceName(question) {
         btn.dataset.answer = name;
         btn.addEventListener('click', () => checkAnswer(name, correctName, btn, 'name'));
         answerContainer.appendChild(btn);
+    });
+}
+
+// Display multiple choice for academy
+function displayMultipleChoiceAcademy(question) {
+    // Debug: Check available school fields
+    console.log('Student data:', question);
+    console.log('School field:', question.School);
+    
+    const correctAcademy = question.School || 'Unknown';
+    console.log('Correct academy:', correctAcademy);
+    
+    const answerContainer = document.getElementById('answer-container');
+    
+    // Blue Archive academies
+    const academies = ['Gehenna', 'Trinity', 'Millennium', 'Abydos', 'Shanhaijing', 'Hyakkiyako', 'Red Winter', 'Valkyrie', 'Arius', 'SRT'];
+    
+    // Generate options (correct academy + 3 random academies)
+    const options = new Set([correctAcademy]);
+    const shuffledAcademies = shuffleArray(academies.filter(a => a !== correctAcademy));
+    
+    for (let i = 0; i < 3 && i < shuffledAcademies.length; i++) {
+        options.add(shuffledAcademies[i]);
+    }
+    
+    const optionsArray = shuffleArray([...options]);
+    
+    optionsArray.forEach(academy => {
+        const button = document.createElement('button');
+        button.className = 'answer-btn';
+        button.textContent = academy;
+        button.dataset.answer = academy;
+        button.addEventListener('click', () => checkAnswer(academy, correctAcademy, button, 'academy'));
+        answerContainer.appendChild(button);
     });
 }
 
@@ -297,29 +364,103 @@ function displayTypeInName(question) {
     input.focus();
 }
 
+// Display type-in input for academy
+function displayTypeInAcademy(question) {
+    const answerContainer = document.getElementById('answer-container');
+    
+    const group = document.createElement('div');
+    group.className = 'type-in-group';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'type-in-input';
+    input.placeholder = 'Enter academy name';
+    input.id = 'academy-input';
+    
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'submit-answer-btn';
+    submitBtn.textContent = 'Submit';
+    submitBtn.addEventListener('click', () => {
+        const userAcademy = input.value.trim();
+        if (userAcademy) {
+            const correctAcademy = question.School || 'Unknown';
+            checkAnswer(userAcademy, correctAcademy, submitBtn, 'academy');
+        }
+    });
+    
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitBtn.click();
+        }
+    });
+    
+    group.appendChild(input);
+    group.appendChild(submitBtn);
+    answerContainer.appendChild(group);
+    
+    input.focus();
+}
+
 // Check the user's answer
 function checkAnswer(userAnswer, correctAnswer, element, type) {
     stopTimer();
-    const isCorrect = type === 'age'
-        ? userAnswer === correctAnswer
-        : userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+    
+    let isCorrect;
+    if (type === 'age') {
+        isCorrect = userAnswer === correctAnswer;
+    } else {
+        // Case-insensitive comparison for names and academies
+        isCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+    }
 
-    userAnswers.push({ student: quizQuestions[currentQuestionIndex], userAnswer, correctAnswer, isCorrect, questionType: type });
+    userAnswers.push({ 
+        student: quizQuestions[currentQuestionIndex], 
+        userAnswer, 
+        correctAnswer, 
+        isCorrect, 
+        questionType: type 
+    });
+    
     if (isCorrect) score++;
     document.getElementById('current-score').textContent = score;
 
     const feedback = document.getElementById('feedback');
     const feedbackText = document.getElementById('feedback-text');
     const studentName = quizQuestions[currentQuestionIndex].Name;
-    feedback.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
-    feedbackText.innerHTML = isCorrect
-        ? `<strong>✅ Correct!</strong><br>${type === 'age' ? studentName + ' is ' + correctAnswer + ' years old.' : 'This student is ' + correctAnswer + '.'}`
-        : `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, correct answer: ${correctAnswer}.`;
+    
+    if (isCorrect) {
+        feedback.className = 'feedback correct';
+        if (type === 'age') {
+            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${studentName} is ${correctAnswer} years old.`;
+        } else if (type === 'academy') {
+            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${studentName} attends ${correctAnswer}.`;
+        } else {
+            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>This student is ${correctAnswer}.`;
+        }
+    } else {
+        feedback.className = 'feedback incorrect';
+        if (type === 'age') {
+            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but ${studentName} is ${correctAnswer} years old.`;
+        } else if (type === 'academy') {
+            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but ${studentName} attends ${correctAnswer}.`;
+        } else {
+            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but this student is ${correctAnswer}.`;
+        }
+    }
 
     feedback.classList.remove('hidden');
 
     // Disable all answer buttons and inputs
-    document.querySelectorAll('.answer-btn, .type-in-input, .submit-answer-btn').forEach(el => el.disabled = true);
+    document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+    
+    let inputFieldId;
+    if (type === 'age') inputFieldId = 'age-input';
+    else if (type === 'name') inputFieldId = 'name-input';
+    else if (type === 'academy') inputFieldId = 'academy-input';
+    const inputField = document.getElementById(inputFieldId);
+    if (inputField) inputField.disabled = true;
+    
+    document.querySelectorAll('.submit-answer-btn').forEach(btn => btn.disabled = true);
 
     document.getElementById('next-btn').onclick = nextQuestion;
 }
@@ -343,13 +484,18 @@ function showResults() {
     resultsDetails.innerHTML = '';
 
     userAnswers.forEach(a => {
+        let questionTypeLabel;
+        if (a.questionType === 'age') questionTypeLabel = 'Age';
+        else if (a.questionType === 'name') questionTypeLabel = 'Name';
+        else if (a.questionType === 'academy') questionTypeLabel = 'Academy';
+        
         const item = document.createElement('div');
         item.className = `result-item ${a.isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
         item.innerHTML = `
             <img src="https://schaledb.com/images/student/collection/${a.student.Id}.webp" alt="${a.student.Name}">
             <div class="result-info">
                 <strong>${a.student.Name}</strong>
-                <span>${a.questionType === 'age' ? 'Age' : 'Name'} - Your answer: ${a.userAnswer} | Correct: ${a.correctAnswer}</span>
+                <span>${questionTypeLabel} - Your answer: ${a.userAnswer} | Correct: ${a.correctAnswer}</span>
             </div>
             <div class="result-status">${a.isCorrect ? '✅' : '❌'}</div>
         `;
@@ -414,9 +560,23 @@ function stopTimer() {
 // Handle time running out
 function handleTimeout() {
     const question = quizQuestions[currentQuestionIndex];
-    const correctAnswer = question.questionType === 'age' ? getStudentAge(question) : question.Name;
+    let correctAnswer;
+    
+    if (question.questionType === 'age') {
+        correctAnswer = getStudentAge(question);
+    } else if (question.questionType === 'name') {
+        correctAnswer = question.Name;
+    } else if (question.questionType === 'academy') {
+        correctAnswer = question.School || 'Unknown';
+    }
 
-    userAnswers.push({ student: question, userAnswer: 'Time expired', correctAnswer, isCorrect: false, questionType: question.questionType });
+    userAnswers.push({ 
+        student: question, 
+        userAnswer: 'Time expired', 
+        correctAnswer, 
+        isCorrect: false, 
+        questionType: question.questionType 
+    });
 
     const feedback = document.getElementById('feedback');
     const feedbackText = document.getElementById('feedback-text');
@@ -427,6 +587,59 @@ function handleTimeout() {
     document.querySelectorAll('.answer-btn, .type-in-input, .submit-answer-btn').forEach(el => el.disabled = true);
     document.getElementById('next-btn').onclick = nextQuestion;
 }
+
+function openShareModal() {
+    const finalScore = score;
+    const totalQuestions = quizQuestions.length;
+    const percentage = Math.round((finalScore / totalQuestions) * 100);
+    
+    let quizTypeText = '';
+    switch(quizSettings.quizType) {
+        case 'age': quizTypeText = 'Age'; break;
+        case 'name': quizTypeText = 'Name'; break;
+        case 'academy': quizTypeText = 'Academy'; break;
+        case 'mixed': quizTypeText = 'Mixed'; break;
+    }
+    
+    const shareMessage = `I scored ${finalScore}/${totalQuestions} (${percentage}%) on the Blue Archive ${quizTypeText} Quiz! 🎯\n\nThink you can beat my score? Try it yourself!`;
+    
+    shareText.textContent = shareMessage;
+    shareModal.classList.add('active');
+}
+
+function closeShareModal() {
+    shareModal.classList.remove('active');
+}
+
+// Share buttons
+document.getElementById('share-twitter').addEventListener('click', () => {
+    const text = encodeURIComponent(shareText.textContent);
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+});
+
+document.getElementById('share-facebook').addEventListener('click', () => {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+});
+
+document.getElementById('share-reddit').addEventListener('click', () => {
+    const text = encodeURIComponent(shareText.textContent);
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.reddit.com/submit?title=${text}&url=${url}`, '_blank');
+});
+
+document.getElementById('share-copy').addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(shareText.textContent);
+        const btn = document.getElementById('share-copy');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => btn.innerHTML = originalText, 2000);
+    } catch (err) {
+        alert('Failed to copy. Please copy manually.');
+    }
+});
 
 // Initialize on load
 window.addEventListener('load', () => {
