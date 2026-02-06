@@ -48,3 +48,5 @@ Works on all modern browsers:
 - Firefox
 - Safari
 - Edge
+
+## More info here
