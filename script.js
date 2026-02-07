@@ -7,74 +7,52 @@ let userAnswers = [];
 let timerInterval = null;
 let timeRemaining = 0;
 
-// DOM elements
-const setupScreen = document.getElementById('setup-screen');
-const quizScreen = document.getElementById('quiz-screen');
-const resultsScreen = document.getElementById('results-screen');
-const startBtn = document.getElementById('start-btn');
-const loadingDiv = document.getElementById('loading');
-const errorMessage = document.getElementById('error-message');
-const restartBtn = document.getElementById('restart-btn');
-const themeToggle = document.getElementById('theme-toggle');
-
-// Event listeners for buttons
-startBtn.addEventListener('click', startQuiz);
-restartBtn.addEventListener('click', resetQuiz);
-themeToggle.addEventListener('click', toggleTheme);
-
-// Timer settings toggle
-const timerEnabledCheckbox = document.getElementById('timer-enabled');
-const timerSettings = document.getElementById('timer-settings');
-timerEnabledCheckbox.addEventListener('change', e => {
-    timerSettings.style.display = e.target.checked ? 'block' : 'none';
-});
-
-// Timer presets handling
-const timerPresets = document.querySelectorAll('input[name="timer-preset"]');
-const timerCustomInput = document.getElementById('timer-custom');
-timerPresets.forEach(radio => {
-    radio.addEventListener('change', e => {
-        timerCustomInput.disabled = e.target.value !== 'custom';
-        if (e.target.value === 'custom') timerCustomInput.focus();
-    });
-});
-timerCustomInput.addEventListener('input', e => {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val) && val > 0) timeRemaining = val;
-});
-
 // Update quiz logo based on theme
 function updateLogo() {
     const logo = document.getElementById('logo');
-    logo.src = document.body.classList.contains('dark-mode')
+    if (!logo) return;
+
+    const isDark = document.documentElement.classList.contains('dark-mode');
+
+    logo.src = isDark
         ? 'images/ba_student_quiz_logo_dark.png'
         : 'images/ba_student_quiz_logo.png';
 }
 
-// Theme toggle
 function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = themeToggle.querySelector('.theme-icon');
-    if (document.body.classList.contains('dark-mode')) {
-        themeIcon.textContent = '☀️';
-        localStorage.setItem('theme', 'dark');
-    } else {
-        themeIcon.textContent = '🌙';
-        localStorage.setItem('theme', 'light');
-    }
+
+    const isDark = root.classList.toggle('dark-mode');
+
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    themeIcon.textContent = isDark ? '☀️' : '🌙';
+
     updateLogo();
 }
 
 // Load saved theme on page load
 function loadTheme() {
     const savedTheme = localStorage.getItem('theme');
-    const themeIcon = themeToggle.querySelector('.theme-icon');
+    const root = document.documentElement;
+
     if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        themeIcon.textContent = '☀️';
+        root.classList.add('dark-mode');
     } else {
-        themeIcon.textContent = '🌙';
+        root.classList.remove('dark-mode');
     }
+
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        const themeIcon = themeToggle.querySelector('.theme-icon');
+        themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+    window.addEventListener("load", () => {
+        document.body.classList.add("theme-ready");
+    });
+
+    updateLogo();
 }
 
 // Fetch student data from GitHub
@@ -86,7 +64,7 @@ async function fetchStudentData() {
         if (!response.ok) throw new Error('Failed to fetch student data');
         const data = await response.json();
         let studentsArray = Array.isArray(data) ? data : Object.values(data);
-        
+
         console.log('Sample student:', studentsArray[0]);
         console.log('All keys:', Object.keys(studentsArray[0]));
 
@@ -134,7 +112,7 @@ async function startQuiz() {
         timerEnabled: document.getElementById('timer-enabled').checked,
         timerDuration
     };
-    
+
     console.log('Quiz Settings:', quizSettings);
 
     // Fetch students if not loaded
@@ -172,7 +150,7 @@ function prepareQuizQuestions() {
         console.log(`Student: ${student.Name}, Question Type: ${questionType}`);
         return { ...student, questionType };
     });
-    
+
     console.log('Quiz Questions prepared:', quizQuestions);
 }
 
@@ -211,7 +189,7 @@ function displayQuestion() {
     // Render answer options
     const answerContainer = document.getElementById('answer-container');
     answerContainer.innerHTML = '';
-    
+
     if (question.questionType === 'age') {
         if (quizSettings.answerType === 'multiple-choice') {
             answerContainer.className = 'answer-container multiple-choice';
@@ -287,25 +265,25 @@ function displayMultipleChoiceAcademy(question) {
     // Debug: Check available school fields
     console.log('Student data:', question);
     console.log('School field:', question.School);
-    
+
     const correctAcademy = question.School || 'Unknown';
     console.log('Correct academy:', correctAcademy);
-    
+
     const answerContainer = document.getElementById('answer-container');
-    
+
     // Blue Archive academies
     const academies = ['Gehenna', 'Trinity', 'Millennium', 'Abydos', 'Shanhaijing', 'Hyakkiyako', 'Red Winter', 'Valkyrie', 'Arius', 'SRT'];
-    
+
     // Generate options (correct academy + 3 random academies)
     const options = new Set([correctAcademy]);
     const shuffledAcademies = shuffleArray(academies.filter(a => a !== correctAcademy));
-    
+
     for (let i = 0; i < 3 && i < shuffledAcademies.length; i++) {
         options.add(shuffledAcademies[i]);
     }
-    
+
     const optionsArray = shuffleArray([...options]);
-    
+
     optionsArray.forEach(academy => {
         const button = document.createElement('button');
         button.className = 'answer-btn';
@@ -367,16 +345,16 @@ function displayTypeInName(question) {
 // Display type-in input for academy
 function displayTypeInAcademy(question) {
     const answerContainer = document.getElementById('answer-container');
-    
+
     const group = document.createElement('div');
     group.className = 'type-in-group';
-    
+
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'type-in-input';
     input.placeholder = 'Enter academy name';
     input.id = 'academy-input';
-    
+
     const submitBtn = document.createElement('button');
     submitBtn.className = 'submit-answer-btn';
     submitBtn.textContent = 'Submit';
@@ -387,24 +365,24 @@ function displayTypeInAcademy(question) {
             checkAnswer(userAcademy, correctAcademy, submitBtn, 'academy');
         }
     });
-    
+
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             submitBtn.click();
         }
     });
-    
+
     group.appendChild(input);
     group.appendChild(submitBtn);
     answerContainer.appendChild(group);
-    
+
     input.focus();
 }
 
 // Check the user's answer
 function checkAnswer(userAnswer, correctAnswer, element, type) {
     stopTimer();
-    
+
     let isCorrect;
     if (type === 'age') {
         isCorrect = userAnswer === correctAnswer;
@@ -413,21 +391,21 @@ function checkAnswer(userAnswer, correctAnswer, element, type) {
         isCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
     }
 
-    userAnswers.push({ 
-        student: quizQuestions[currentQuestionIndex], 
-        userAnswer, 
-        correctAnswer, 
-        isCorrect, 
-        questionType: type 
+    userAnswers.push({
+        student: quizQuestions[currentQuestionIndex],
+        userAnswer,
+        correctAnswer,
+        isCorrect,
+        questionType: type
     });
-    
+
     if (isCorrect) score++;
     document.getElementById('current-score').textContent = score;
 
     const feedback = document.getElementById('feedback');
     const feedbackText = document.getElementById('feedback-text');
     const studentName = quizQuestions[currentQuestionIndex].Name;
-    
+
     if (isCorrect) {
         feedback.className = 'feedback correct';
         if (type === 'age') {
@@ -452,14 +430,14 @@ function checkAnswer(userAnswer, correctAnswer, element, type) {
 
     // Disable all answer buttons and inputs
     document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
-    
+
     let inputFieldId;
     if (type === 'age') inputFieldId = 'age-input';
     else if (type === 'name') inputFieldId = 'name-input';
     else if (type === 'academy') inputFieldId = 'academy-input';
     const inputField = document.getElementById(inputFieldId);
     if (inputField) inputField.disabled = true;
-    
+
     document.querySelectorAll('.submit-answer-btn').forEach(btn => btn.disabled = true);
 
     document.getElementById('next-btn').onclick = nextQuestion;
@@ -488,7 +466,7 @@ function showResults() {
         if (a.questionType === 'age') questionTypeLabel = 'Age';
         else if (a.questionType === 'name') questionTypeLabel = 'Name';
         else if (a.questionType === 'academy') questionTypeLabel = 'Academy';
-        
+
         const item = document.createElement('div');
         item.className = `result-item ${a.isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
         item.innerHTML = `
@@ -561,7 +539,7 @@ function stopTimer() {
 function handleTimeout() {
     const question = quizQuestions[currentQuestionIndex];
     let correctAnswer;
-    
+
     if (question.questionType === 'age') {
         correctAnswer = getStudentAge(question);
     } else if (question.questionType === 'name') {
@@ -570,12 +548,12 @@ function handleTimeout() {
         correctAnswer = question.School || 'Unknown';
     }
 
-    userAnswers.push({ 
-        student: question, 
-        userAnswer: 'Time expired', 
-        correctAnswer, 
-        isCorrect: false, 
-        questionType: question.questionType 
+    userAnswers.push({
+        student: question,
+        userAnswer: 'Time expired',
+        correctAnswer,
+        isCorrect: false,
+        questionType: question.questionType
     });
 
     const feedback = document.getElementById('feedback');
@@ -592,7 +570,7 @@ function openShareModal() {
     const finalScore = score;
     const totalQuestions = quizQuestions.length;
     const percentage = Math.round((finalScore / totalQuestions) * 100);
-    
+
     let quizTypeText = '';
     switch(quizSettings.quizType) {
         case 'age': quizTypeText = 'Age'; break;
@@ -600,9 +578,9 @@ function openShareModal() {
         case 'academy': quizTypeText = 'Academy'; break;
         case 'mixed': quizTypeText = 'Mixed'; break;
     }
-    
+
     const shareMessage = `I scored ${finalScore}/${totalQuestions} (${percentage}%) on the Blue Archive ${quizTypeText} Quiz! 🎯\n\nThink you can beat my score? Try it yourself!`;
-    
+
     shareText.textContent = shareMessage;
     shareModal.classList.add('active');
 }
@@ -611,38 +589,48 @@ function closeShareModal() {
     shareModal.classList.remove('active');
 }
 
-// Share buttons
-document.getElementById('share-twitter').addEventListener('click', () => {
-    const text = encodeURIComponent(shareText.textContent);
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-});
-
-document.getElementById('share-facebook').addEventListener('click', () => {
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-});
-
-document.getElementById('share-reddit').addEventListener('click', () => {
-    const text = encodeURIComponent(shareText.textContent);
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://www.reddit.com/submit?title=${text}&url=${url}`, '_blank');
-});
-
-document.getElementById('share-copy').addEventListener('click', async () => {
-    try {
-        await navigator.clipboard.writeText(shareText.textContent);
-        const btn = document.getElementById('share-copy');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => btn.innerHTML = originalText, 2000);
-    } catch (err) {
-        alert('Failed to copy. Please copy manually.');
-    }
-});
-
 // Initialize on load
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
+    // Set up event listeners after DOM is ready
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const timerEnabledCheckbox = document.getElementById('timer-enabled');
+    const timerSettings = document.getElementById('timer-settings');
+    const timerCustomInput = document.getElementById('timer-custom');
+    const timerPresets = document.querySelectorAll('input[name="timer-preset"]');
+
+    if (startBtn) startBtn.addEventListener('click', startQuiz);
+    if (restartBtn) restartBtn.addEventListener('click', resetQuiz);
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    } else {
+        console.error('Theme toggle button not found!');
+    }
+
+    if (timerEnabledCheckbox && timerSettings) {
+        timerEnabledCheckbox.addEventListener('change', e => {
+            timerSettings.style.display = e.target.checked ? 'block' : 'none';
+        });
+    }
+
+    if (timerPresets && timerCustomInput) {
+        timerPresets.forEach(radio => {
+            radio.addEventListener('change', e => {
+                timerCustomInput.disabled = e.target.value !== 'custom';
+                if (e.target.value === 'custom') timerCustomInput.focus();
+            });
+        });
+    }
+
+    if (timerCustomInput) {
+        timerCustomInput.addEventListener('input', e => {
+            const val = parseInt(e.target.value);
+            if (!isNaN(val) && val > 0) timeRemaining = val;
+        });
+    }
+
     loadTheme();
-    updateLogo();
 });
+
+document.addEventListener("DOMContentLoaded", loadTheme);

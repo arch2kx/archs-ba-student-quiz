@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        // Must be first script in head - blocks rendering to prevent flash
+        (function () {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+  }
+})();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue Archive Student Quiz</title>
-    <link rel="stylesheet" href="styles.css?v=4" type="text/css">
+    <link rel="stylesheet" href="styles.css?v=9" type="text/css">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <script>
+        // Apply dark mode to body immediately after it exists
+        if (document.documentElement.classList.contains('dark-mode')) {
+            document.body.classList.add('dark-mode');
+            window.addEventListener('DOMContentLoaded', function() {
+                const themeIcon = document.querySelector('#theme-toggle .theme-icon');
+                if (themeIcon) themeIcon.textContent = '☀️';
+                const logo = document.getElementById('logo');
+                if (logo) logo.src = 'images/ba_student_quiz_logo_dark.png';
+            });
+        }
+    </script>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
         <span class="theme-icon">🌙</span>
     </button>
 
     <div class="container">
         <!--<h1>Blue Archive Student Quiz</h1>-->
-        <img id="logo" src="images/ba_student_quiz_logo.png" alt="Blue Archive Student Quiz" class="logo">
+        <img id="logo" src="images/ba_stdent_quiz_logo.png" alt="Blue Archive Student Quiz" class="logo">
 
         <div id="setup-screen" class="screen active">
             <h2>Quiz Settings</h2>

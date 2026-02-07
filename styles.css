@@ -1,3 +1,8 @@
+html, body {
+  background-color: #0f0f0f;
+}
+
+
 * {
     margin: 0;
     padding: 0;
@@ -21,7 +26,7 @@
     --button-hover: #f0f0f0;
 }
 
-body.dark-mode {
+html.dark-mode {
     --bg-primary: #1a1a1a;
     --bg-secondary: #2d2d2d;
     --bg-tertiary: #3a3a3a;
@@ -47,7 +52,7 @@ body.dark-mode {
 }
 
 /* Dark mode logo swap */
-body.dark-mode .logo {
+html.dark-mode .logo {
     content: url('images/ba_student_quiz_logo_dark.png');
 }
 
@@ -55,7 +60,10 @@ body {
     font-family: Noto Sans, sans-serif;
     background-color: var(--bg-primary);
     padding: 20px;
-    transition: background-color 0.3s ease;
+}
+
+body.theme-ready {
+  transition: background-color 0.3s ease;
 }
 
 .theme-toggle {
@@ -614,7 +622,7 @@ h3 {
 }
 
 /* Dark mode - white timer */
-body.dark-mode .timer-display {
+html.dark-mode .timer-display {
     color: #ffffff;
 }
 
@@ -624,7 +632,7 @@ body.dark-mode .timer-display {
     animation: pulse 1s infinite;
 }
 
-body.dark-mode .timer-display.warning {
+html.dark-mode .timer-display.warning {
     color: #ffb74d;
 }
 
@@ -634,7 +642,7 @@ body.dark-mode .timer-display.warning {
     animation: pulse 0.5s infinite;
 }
 
-body.dark-mode .timer-display.danger {
+html.dark-mode .timer-display.danger {
     color: #ff5252;
 }
 
