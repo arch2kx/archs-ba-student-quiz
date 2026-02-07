@@ -57,32 +57,36 @@ function loadTheme() {
 
 // Fetch student data from GitHub
 async function fetchStudentData() {
-    try {
-        loadingDiv.classList.remove('hidden');
-        errorMessage.classList.add('hidden');
-        const response = await fetch('https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/data/en/students.json');
-        if (!response.ok) throw new Error('Failed to fetch student data');
-        const data = await response.json();
-        let studentsArray = Array.isArray(data) ? data : Object.values(data);
+const loadingDiv = document.getElementById('loading');
+const errorMessage = document.getElementById('error-message');
 
-        console.log('Sample student:', studentsArray[0]);
-        console.log('All keys:', Object.keys(studentsArray[0]));
+try {
+loadingDiv.classList.remove('hidden');
+errorMessage.classList.add('hidden');
+const response = await fetch('https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/data/en/students.json');
+if (!response.ok) throw new Error('Failed to fetch student data');
+const data = await response.json();
+let studentsArray = Array.isArray(data) ? data : Object.values(data);
+        
+// console.log('Sample student:', studentsArray[0]);
+// console.log('All keys:', Object.keys(studentsArray[0]));
 
-        // Filter students with valid age AND academy
-        students = studentsArray.filter(student => {
-            const age = student.Age || student.age || student.CharacterAge;
-            const hasAge = age && age !== 'Unknown' && age !== '?' && !isNaN(parseInt(age));
+
+// Filter students with valid age AND academy
+students = studentsArray.filter(student => {
+const age = student.Age || student.age || student.CharacterAge;
+    const hasAge = age && age !== 'Unknown' && age !== '?' && !isNaN(parseInt(age));
             const hasAcademy = student.School && student.School !== 'Unknown';
-            return hasAge && hasAcademy;
-        });
+    return hasAge && hasAcademy;
+});
 
-        if (students.length === 0) throw new Error('No valid student data found');
-        loadingDiv.classList.add('hidden');
-        return true;
-    } catch (error) {
-        console.error(error);
-        loadingDiv.classList.add('hidden');
-        errorMessage.textContent = `Error loading student data: ${error.message}. Please try again.`;
+    if (students.length === 0) throw new Error('No valid student data found');
+loadingDiv.classList.add('hidden');
+return true;
+} catch (error) {
+console.error(error);
+loadingDiv.classList.add('hidden');
+    errorMessage.textContent = `Error loading student data: ${error.message}. Please try again.`;
         errorMessage.classList.remove('hidden');
         return false;
     }
@@ -90,40 +94,44 @@ async function fetchStudentData() {
 
 // Start the quiz
 async function startQuiz() {
-    // Determine timer duration
-    const selectedPreset = document.querySelector('input[name="timer-preset"]:checked');
-    let timerDuration = 10;
-    if (selectedPreset) {
-        if (selectedPreset.value === 'custom') {
-            const val = parseInt(timerCustomInput.value);
-            if (!isNaN(val) && val > 0) timerDuration = val;
-        } else {
+const timerCustomInput = document.getElementById('timer-custom');
+const setupScreen = document.getElementById('setup-screen');
+const quizScreen = document.getElementById('quiz-screen');
+
+// Determine timer duration
+const selectedPreset = document.querySelector('input[name="timer-preset"]:checked');
+let timerDuration = 10;
+if (selectedPreset) {
+if (selectedPreset.value === 'custom') {
+const val = parseInt(timerCustomInput.value);
+    if (!isNaN(val) && val > 0) timerDuration = val;
+    } else {
             const val = parseInt(selectedPreset.value);
-            if (!isNaN(val)) timerDuration = val;
-        }
+        if (!isNaN(val)) timerDuration = val;
     }
+}
 
-    // Collect quiz settings
-    quizSettings = {
-        quizType: document.getElementById('quiz-type').value,
-        numQuestions: parseInt(document.getElementById('num-questions').value) || 5,
-        answerType: document.getElementById('answer-type').value,
-        studentOrder: document.getElementById('student-order').value,
-        timerEnabled: document.getElementById('timer-enabled').checked,
+// Collect quiz settings
+quizSettings = {
+quizType: document.getElementById('quiz-type').value,
+numQuestions: parseInt(document.getElementById('num-questions').value) || 5,
+    answerType: document.getElementById('answer-type').value,
+    studentOrder: document.getElementById('student-order').value,
+    timerEnabled: document.getElementById('timer-enabled').checked,
         timerDuration
-    };
+};
 
-    console.log('Quiz Settings:', quizSettings);
+console.log('Quiz Settings:', quizSettings);
 
-    // Fetch students if not loaded
+// Fetch students if not loaded
     if (students.length === 0) {
-        const success = await fetchStudentData();
-        if (!success) return;
-    }
+    const success = await fetchStudentData();
+    if (!success) return;
+}
 
-    prepareQuizQuestions();
-    currentQuestionIndex = 0;
-    score = 0;
+prepareQuizQuestions();
+currentQuestionIndex = 0;
+score = 0;
     userAnswers = [];
     setupScreen.classList.remove('active');
     quizScreen.classList.add('active');
@@ -147,7 +155,7 @@ function prepareQuizQuestions() {
         if (quizSettings.quizType === 'mixed') {
             questionType = ['age', 'name', 'academy'][Math.floor(Math.random() * 3)];
         }
-        console.log(`Student: ${student.Name}, Question Type: ${questionType}`);
+        // console.log(`Student: ${student.Name}, Question Type: ${questionType}`);
         return { ...student, questionType };
     });
 
@@ -452,30 +460,33 @@ function nextQuestion() {
 
 // Show final results
 function showResults() {
-    quizScreen.classList.remove('active');
-    resultsScreen.classList.add('active');
+const quizScreen = document.getElementById('quiz-screen');
+const resultsScreen = document.getElementById('results-screen');
+
+quizScreen.classList.remove('active');
+resultsScreen.classList.add('active');
     document.getElementById('final-score').textContent = score;
-    document.getElementById('final-total').textContent = quizQuestions.length;
-    document.getElementById('percentage').textContent = Math.round((score / quizQuestions.length) * 100);
+document.getElementById('final-total').textContent = quizQuestions.length;
+document.getElementById('percentage').textContent = Math.round((score / quizQuestions.length) * 100);
 
-    const resultsDetails = document.getElementById('results-details');
-    resultsDetails.innerHTML = '';
+const resultsDetails = document.getElementById('results-details');
+resultsDetails.innerHTML = '';
 
-    userAnswers.forEach(a => {
-        let questionTypeLabel;
-        if (a.questionType === 'age') questionTypeLabel = 'Age';
-        else if (a.questionType === 'name') questionTypeLabel = 'Name';
-        else if (a.questionType === 'academy') questionTypeLabel = 'Academy';
+userAnswers.forEach(a => {
+let questionTypeLabel;
+if (a.questionType === 'age') questionTypeLabel = 'Age';
+else if (a.questionType === 'name') questionTypeLabel = 'Name';
+else if (a.questionType === 'academy') questionTypeLabel = 'Academy';
 
-        const item = document.createElement('div');
-        item.className = `result-item ${a.isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
-        item.innerHTML = `
-            <img src="https://schaledb.com/images/student/collection/${a.student.Id}.webp" alt="${a.student.Name}">
-            <div class="result-info">
-                <strong>${a.student.Name}</strong>
-                <span>${questionTypeLabel} - Your answer: ${a.userAnswer} | Correct: ${a.correctAnswer}</span>
-            </div>
-            <div class="result-status">${a.isCorrect ? '✅' : '❌'}</div>
+const item = document.createElement('div');
+item.className = `result-item ${a.isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
+item.innerHTML = `
+<img src="https://schaledb.com/images/student/collection/${a.student.Id}.webp" alt="${a.student.Name}">
+<div class="result-info">
+    <strong>${a.student.Name}</strong>
+        <span>${questionTypeLabel} - Your answer: ${a.userAnswer} | Correct: ${a.correctAnswer}</span>
+    </div>
+        <div class="result-status">${a.isCorrect ? '✅' : '❌'}</div>
         `;
         resultsDetails.appendChild(item);
     });
@@ -483,6 +494,9 @@ function showResults() {
 
 // Reset quiz to setup
 function resetQuiz() {
+    const resultsScreen = document.getElementById('results-screen');
+    const setupScreen = document.getElementById('setup-screen');
+    
     resultsScreen.classList.remove('active');
     setupScreen.classList.add('active');
     currentQuestionIndex = 0;
