@@ -42,6 +42,7 @@ html.dark-mode {
     --button-hover: #404040;
 }
 
+
 .logo {
     width: 90%;  /* 20% smaller = 80% of original */
     max-width: 400px;  /* Optional: set a max size */
