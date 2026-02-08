@@ -463,7 +463,6 @@ h3 {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .social-icon {
     font-size: 20px;
 }
@@ -471,6 +470,38 @@ h3 {
 .social-text {
     font-weight: 500;
     font-size: 14px;
+}
+
+.x-share-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+.x-share-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 150px;
+    height: 50px;
+    padding: 10px 20px;
+    background-color: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.x-share-button:hover {
+    background-color: var(--button-hover);
+    border-color: var(--info-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.x-share-button .fa-x-twitter {
+    font-size: 20px;
+    color: #ffffff;
 }
 
 /* Responsive adjustments */
@@ -484,6 +515,11 @@ h3 {
         width: 100%;
         max-width: 250px;
         justify-content: center;
+    }
+
+    .x-share-btn {
+        width: 90%;
+        max-width: 300px;
     }
 }
 

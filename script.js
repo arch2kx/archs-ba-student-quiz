@@ -645,6 +645,28 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     loadTheme();
+
+    // Twitter/X Share Button
+    const xShareButton = document.querySelector('.x-share-button');
+    if (xShareButton) {
+        xShareButton.addEventListener('click', function() {
+            const finalScore = score;
+            const totalQuestions = quizQuestions.length;
+            const quizLink = window.location.href.split('?')[0]; // Get base URL without query params
+            
+            const shareMessage = `I got ${finalScore}/${totalQuestions} in BA Student Quiz! Try playing at ${quizLink}`;
+            
+            // X/Twitter share URL
+            const shareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`;
+            
+            // Open in new tab (not popup)
+            const link = document.createElement('a');
+            link.href = shareUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.click();
+        });
+    }
 });
 
 document.addEventListener("DOMContentLoaded", loadTheme);
