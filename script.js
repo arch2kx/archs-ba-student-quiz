@@ -175,7 +175,8 @@ function displayQuestion() {
     const studentImage = document.getElementById('student-image');
     const studentName = document.getElementById('student-name');
     const questionText = document.querySelector('.question h3');
-    studentImage.src = `https://schaledb.com/images/student/collection/${question.Id}.webp`;
+    // Use portrait image (no background) instead of collection image
+    studentImage.src = `https://schaledb.com/images/student/portrait/${question.Id}.webp`;
     studentImage.alt = question.Name;
 
     // Show question based on type
@@ -390,8 +391,9 @@ function checkAnswer(userAnswer, correctAnswer, element, type) {
     if (type === 'age') {
         isCorrect = userAnswer === correctAnswer;
     } else {
-        // Case-insensitive comparison for names and academies
-        isCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+        // Normalize spacing for academy names (RedWinter vs Red Winter)
+        const normalizeAnswer = (str) => str.toLowerCase().trim().replace(/\s+/g, '');
+        isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
     }
 
     userAnswers.push({
@@ -414,7 +416,7 @@ function checkAnswer(userAnswer, correctAnswer, element, type) {
         if (type === 'age') {
             feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${studentName} is ${correctAnswer} years old.`;
         } else if (type === 'academy') {
-            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${studentName} attends ${correctAnswer}.`;
+            feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>${studentName} attends ${correctAnswer.replace('RedWinter', 'Red Winter')}.`;
         } else {
             feedbackText.innerHTML = `<strong>✅ Correct!</strong><br>This student is ${correctAnswer}.`;
         }
@@ -423,7 +425,7 @@ function checkAnswer(userAnswer, correctAnswer, element, type) {
         if (type === 'age') {
             feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but ${studentName} is ${correctAnswer} years old.`;
         } else if (type === 'academy') {
-            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but ${studentName} attends ${correctAnswer}.`;
+            feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but ${studentName} attends ${correctAnswer.replace('RedWinter', 'Red Winter')}.`;
         } else {
             feedbackText.innerHTML = `<strong>❌ Incorrect!</strong><br>You guessed ${userAnswer}, but this student is ${correctAnswer}.`;
         }
