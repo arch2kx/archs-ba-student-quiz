@@ -270,17 +270,11 @@ function displayMultipleChoiceName(question) {
 
 // Display multiple choice for academy
 function displayMultipleChoiceAcademy(question) {
-    // Debug: Check available school fields
-    console.log('Student data:', question);
-    console.log('School field:', question.School);
-
     const correctAcademy = question.School || 'Unknown';
-    console.log('Correct academy:', correctAcademy);
-
     const answerContainer = document.getElementById('answer-container');
 
-    // Blue Archive academies
-    const academies = ['Gehenna', 'Trinity', 'Millennium', 'Abydos', 'Shanhaijing', 'Hyakkiyako', 'Red Winter', 'Valkyrie', 'Arius', 'SRT'];
+    // Blue Archive academies - using exact names from API
+    const academies = ['Gehenna', 'Trinity', 'Millennium', 'Abydos', 'Shanhaijing', 'Hyakkiyako', 'RedWinter', 'Valkyrie', 'Arius', 'SRT'];
 
     // Generate options (correct academy + 3 random academies)
     const options = new Set([correctAcademy]);
@@ -295,7 +289,8 @@ function displayMultipleChoiceAcademy(question) {
     optionsArray.forEach(academy => {
         const button = document.createElement('button');
         button.className = 'answer-btn';
-        button.textContent = academy;
+        // Display with space for readability
+        button.textContent = academy.replace('RedWinter', 'Red Winter');
         button.dataset.answer = academy;
         button.addEventListener('click', () => checkAnswer(academy, correctAcademy, button, 'academy'));
         answerContainer.appendChild(button);
