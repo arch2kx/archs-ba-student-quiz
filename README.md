@@ -1,4 +1,4 @@
-<img src="images/ba_student_quiz_logo_light_readme.png" alt="Blue Archive Student Quiz" width="425px">
+<img src="images/ba_student_quiz_light_readme.png" alt="Blue Archive Student Quiz" width="425px">
 
 A web-based quiz game that tests your knowledge of Blue Archive students using data from SchaleDB.
 
