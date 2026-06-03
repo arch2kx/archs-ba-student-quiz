@@ -30,15 +30,7 @@
 
     <script>
         // Apply dark mode to body immediately after it exists
-        if (document.documentElement.classList.contains('dark-mode')) {
-            document.body.classList.add('dark-mode');
-            window.addEventListener('DOMContentLoaded', function() {
-                const themeIcon = document.querySelector('#theme-toggle .theme-icon');
-                if (themeIcon) { themeIcon.src = 'images/sun.webp'; themeIcon.alt = 'Toggle theme'; }
-                const logo = document.getElementById('logo');
-                if (logo) logo.src = 'images/ba_student_quiz_logo_dark.png';
-            });
-        }
+        document.body.classList.toggle('dark-mode', document.documentElement.classList.contains('dark-mode'));
     </script>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
         <img class="theme-icon" src="images/crescent-moon.webp" alt="Toggle theme">
@@ -46,7 +38,17 @@
 
     <div class="container">
         <!--<h1>Blue Archive Student Quiz</h1>-->
-        <img id="logo" src="images/ba_student_quiz_logo.png" alt="Blue Archive Student Quiz" class="logo">
+        <img id="logo" src="" alt="Blue Archive Student Quiz" class="logo">
+        <script>
+            (function() {
+                var isDark = document.documentElement.classList.contains('dark-mode');
+                document.getElementById('logo').src = isDark
+                    ? 'images/ba_student_quiz_logo_dark.png'
+                    : 'images/ba_student_quiz_logo.png';
+                var icon = document.querySelector('#theme-toggle .theme-icon');
+                if (icon && isDark) icon.src = 'images/sun.webp';
+            })();
+        </script>
 
         <div id="setup-screen" class="screen active">
             <h2>Quiz Settings</h2>

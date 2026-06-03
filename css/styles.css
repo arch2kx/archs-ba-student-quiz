@@ -55,10 +55,7 @@ html.dark-mode {
     margin: 10px auto;  /* Top margin + centered */
 }
 
-/* Dark mode logo swap */
-html.dark-mode .logo {
-    content: url('images/ba_student_quiz_logo_dark.png');
-}
+/* Dark mode logo swap is handled via inline JS to avoid broken image flash */
 
 body {
     font-family: Noto Sans, sans-serif;
@@ -556,6 +553,62 @@ h3 {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        width: 100%;
+        padding: 20px 15px;
+        border-radius: 8px;
+    }
+
+    .logo {
+        width: 95%;
+    }
+
+    .student-image {
+        width: min(260px, 80vw);
+        height: min(260px, 80vw);
+    }
+
+    #student-name {
+        font-size: 18px;
+    }
+
+    .quiz-header {
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 20px;
+    }
+
+    .progress,
+    .score,
+    .timer-display {
+        font-size: 15px;
+    }
+
+    .answer-container.multiple-choice {
+        grid-template-columns: 1fr;
+    }
+
+    .answer-btn {
+        font-size: 16px;
+        padding: 12px 10px;
+    }
+
+    .answer-container.type-in {
+        max-width: 100%;
+    }
+
+    .score-large {
+        font-size: 36px !important;
+    }
+
+    .percentage {
+        font-size: 24px !important;
+    }
+
     .social-links {
         flex-direction: column;
         align-items: center;
@@ -570,6 +623,13 @@ h3 {
     .x-share-btn {
         width: 90%;
         max-width: 300px;
+    }
+
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
     }
 }
 
