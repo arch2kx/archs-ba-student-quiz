@@ -5,17 +5,17 @@ A web-based quiz game that tests your knowledge of Blue Archive students using d
 ## Features
 
 - Multiple quiz settings for customized gameplay
-- Two answer modes: Multiple Choice or Type-In
-- Student selection options: Random, Popular First, or Least Popular First
-- Adjustable question count (5, 10, 15, 20, or 30 questions)
+- Two answer modes
+- Student selection options
+- Adjustable question count
 - Dark mode and light mode toggle
 - Immediate feedback on answers
-- Detailed results screen with score breakdown
+- Results screen with score breakdown
 - Responsive design for mobile and desktop
 
 ## How to Use
 
-Locally:
+Local:
 1. Open `index.html` in your web browser
 2. Configure your quiz settings:
    - Choose the number of questions
@@ -25,7 +25,7 @@ Locally:
 4. Answer each question about student names, ages, or both
 5. View your final score and results
 
-Online Version:
+Online:
 https://arch2kx.github.io/archs-ba-student-quiz/
 
 No additional dependencies or installation required. Just open the HTML file in any modern web browser.
@@ -33,7 +33,7 @@ No additional dependencies or installation required. Just open the HTML file in 
 ## Technical Details
 
 - Uses SchaleDB's GitHub repository for student data
-- Pure HTML, CSS, and JavaScript (no frameworks required)
+- HTML, CSS, and TypeScript
 - LocalStorage for theme preference persistence
 - Responsive design with CSS Grid and Flexbox
 

@@ -13,24 +13,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue Archive Student Quiz</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="favicon_io/site.webmanifest">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css?v=9" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 <body>
+    <script type="module" src="js/script.js"></script>
+
     <script>
         // Apply dark mode to body immediately after it exists
         if (document.documentElement.classList.contains('dark-mode')) {
             document.body.classList.add('dark-mode');
             window.addEventListener('DOMContentLoaded', function() {
                 const themeIcon = document.querySelector('#theme-toggle .theme-icon');
-                if (themeIcon) themeIcon.textContent = '☀️';
+                if (themeIcon) { themeIcon.src = 'images/sun.webp'; themeIcon.alt = 'Toggle theme'; }
                 const logo = document.getElementById('logo');
                 if (logo) logo.src = 'images/ba_student_quiz_logo_dark.png';
             });
         }
     </script>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-        <span class="theme-icon">🌙</span>
+        <img class="theme-icon" src="images/crescent-moon.webp" alt="Toggle theme">
     </button>
 
     <div class="container">
@@ -46,6 +57,13 @@
                     <option value="age" selected>Age Quiz</option>
                     <option value="name">Name Quiz</option>
                     <option value="academy">Academy Quiz</option>
+                    <option value="birthday">Birthday Quiz</option>
+                    <option value="height">Height Quiz</option>
+                    <option value="voice">Voice Quiz</option>
+                    <option value="role">Role Quiz</option>
+                    <option value="damageType">Damage Type Quiz</option>
+                    <option value="armorType">Armor Type Quiz</option>
+                    <option value="weapon">Weapon Quiz</option>
                     <option value="mixed">Mixed (All Types)</option>
                 </select>
             </div>
@@ -58,7 +76,12 @@
                     <option value="15">15</option>
                     <option value="20">20</option>
                     <option value="30">30</option>
+                    <option value="custom">Custom</option>
                 </select>
+                <div id="custom-questions-wrapper" style="display:none; margin-top: 10px; display: none;">
+                    <input type="number" id="custom-questions" min="5" max="100" value="10" placeholder="5–100">
+                    <span style="margin-left: 8px; color: var(--text-secondary); font-size: 14px;">questions (5–100)</span>
+                </div>
             </div>
 
             <div class="setting-group">
@@ -104,7 +127,7 @@
                         <input type="radio" name="timer-preset" value="custom">
                         <span>Custom:</span>
                         <div class="timer-custom-wrapper">
-                            <input type="number" id="timer-custom" min="5" max="300" value="30" disabled>
+                            <input type="number" id="timer-custom" min="5" max="60" value="30" disabled>
                             <span>seconds</span>
                         </div>
                     </label>
@@ -166,7 +189,7 @@
             <div class="x-share-container">
                 <button class="x-share-button">
                     <i class="fa-brands fa-x-twitter"></i>
-                    Share Score on X
+                    Share Score
                 </button>
             </div>
 
@@ -177,7 +200,8 @@
     <!-- Attribution Footer -->
     <footer class="attribution-footer">
         <div class="attribution-content">
-            <p class="made-by">Made by <strong>arch2kx</strong></p>
+            <p class="made-by">Created by <strong>arch2kx</strong></p>
+            <p class="ba-attribution">Blue Archive is developed by NEXON Games and published by Nexon and Yostar.<br>This is a hobby fan project!</br></p>
             <div class="social-links">
                 <a href="https://github.com/arch2kx" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
                     <i class="fa-brands fa-github"></i>
@@ -193,7 +217,5 @@
             </div>
         </div>
     </footer>
-
-    <script src="js/script.js"></script>
 </body>
 </html>

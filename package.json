@@ -1,0 +1,15 @@
+{
+  "name": "archs-ba-student-quiz",
+  "version": "1.0.0",
+  "description": "<img src=\"images/ba_student_quiz_light_readme.png\" alt=\"Blue Archive Student Quiz\" width=\"425px\">",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}
