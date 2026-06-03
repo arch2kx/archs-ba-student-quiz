@@ -25,7 +25,7 @@ Local:
 4. Answer each question about student names, ages, or both
 5. View your final score and results
 
-Online:
+Online Ver:
 https://arch2kx.github.io/archs-ba-student-quiz/
 
 No additional dependencies or installation required. Just open the HTML file in any modern web browser.
